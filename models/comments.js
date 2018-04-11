@@ -8,7 +8,7 @@ const CommentSchema = new Schema({
     },
     belongs_to: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'topics',
+      ref: 'articles',
       required: true
     },
     created_at: {
