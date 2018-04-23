@@ -7,24 +7,13 @@ const {DB, PORT} = require('../config/index');
 const Chance = require('chance');
 const chance = new Chance;
 
-function seedDB (DB, topics, users, articles) {
+const seedDB = (DB, topics, users, articles) => {
     let topicIds, userIds, articleIds
-    return mongoose.connect(DB)
-    .then(() => {
-        console.log(`connected to ${DB}`)
-        mongoose.connection.db.dropDatabase()
-    })
-    .then(() => {
-        console.log('dropped database')
-        return Topics.insertMany(topics)
-    })
-    .then((topics) => {
+        return Promise.all([Topics.insertMany(topics), Users.insertMany(users)])
+    .then(([topics, users]) => {
         console.log(`inserted ${topics.length} topics` )
-        topicIds = topics;
-        return Users.insertMany(users)
-    })
-    .then((users) => {
         console.log(`inserted ${users.length} users` )
+        topicIds = topics;
         userIds = users;
         const newArticles = articles.map((article, i) => {
             article.belongs_to = topicIds.find(topic => topic.slug === article.topic)._id;
@@ -64,10 +53,19 @@ function seedDB (DB, topics, users, articles) {
     })
     .catch(err => {
         console.log(err);
-        mongoose.disconnect()
     })
 }
 
-seedDB(DB, topicData, userData, articleData)
+mongoose.connect(DB)
+.then(() => {
+    console.log(`connected to ${DB}`)
+    mongoose.connection.db.dropDatabase()
+})
+.then(() => {
+    return seedDB(DB, topicData, userData, articleData)
+})
+.then(() => {
+    mongoose.disconnect()
+})
 
-
+module.exports = {seedDB}
