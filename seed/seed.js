@@ -13,8 +13,7 @@ mongoose.connect(DB)
 .then(() => {
     return seedDB(DB, topicData, userData, articleData)
 })
-.then((idk) => {
-    console.log('this')
+.then(() => {
     mongoose.disconnect()
 })
 .catch(err => console.log('seedfile:', err))
