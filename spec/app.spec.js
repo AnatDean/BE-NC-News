@@ -63,5 +63,60 @@ describe('app', () => {
                 })
             });
         });
+        describe('topics (ERROR handling)', () => {
+            it('GET /topics/:id/articles resolves with a 404 when not an existing topic', () => {
+                return request
+                .get(`/api/topics/fake123/articles`)
+                .expect(404)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that topic doesn't exist!");
+                })
+            });
+            it('POST /topics/:id/articles resolves with a 404 when not an existing topic', () => {
+                const article = {title: 'article', body:'this is my article'}
+                return request
+                .post(`/api/topics/fake123/articles`)
+                .send(article)
+                .expect(404)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that topic doesn't exist!");
+                })
+            });
+            it('POST /topics/:id/articles resolves with a 400 when article missing fields', () => {
+                const article = {body:'this is my article'}
+                return request
+                .post(`/api/topics/${topics[1]._id}/articles`)
+                .send(article)
+                .expect(400)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    expect(body.message).to.equal('Bad Request: Articles have to have a title and a body');
+                })
+            });
+            it('POST /topics/:id/articles resolves with a 404 when valid mongo id but not existing topic', () => {
+                const article = {title: 'article', body:'this is my article'}
+                return request
+                .post(`/api/topics/${articles[1]._id}/articles`)
+                .send(article)
+                .expect(404)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that topic doesn't exist!");
+                })
+            });
+            it('POST /topics/:id/articles resolves with a 400 when article missing fields', () => {
+                const article = ['this is my article']
+                return request
+                .post(`/api/topics/${topics[1]._id}/articles`)
+                .send(article)
+                .expect(400)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    expect(body.message).to.equal('Bad Request: Articles have to have a title and a body');
+                })
+            });
+        });
     });
 });
