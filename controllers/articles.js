@@ -1,4 +1,5 @@
 const {Topics, Articles, Comments, Users} = require('../models')
+const {createComment} = require('../seed/helpers')
 
 exports.getAllArticles = (req,res,next) => {
     return Promise.all([
@@ -40,5 +41,18 @@ exports.getAllArticles = (req,res,next) => {
             article.comments = [...comments];
             res.status(200).send({article})
         })
-        .catch(console.log)
+        .catch(next)
+}
+
+exports.addComment = (req,res,next) => {
+    const {_id} = req.params
+    return Users.findOne({username: 'northcoder'})
+    .then(user => {
+        const comment = createComment(_id, req.body.message, user._id);
+        return Comments.create(comment)
+    })
+    .then(comment => {
+        res.status(201).send({comment}) 
+    })
+    .catch(next)
 }

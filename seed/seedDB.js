@@ -1,4 +1,5 @@
 const {Topics, Users, Articles, Comments} = require('../models/index');
+const {createComment} = require('./helpers')
 const Chance = require('chance');
 const chance = new Chance;
 
@@ -24,23 +25,13 @@ const seedDB = (DB, topics, users, articles) => {
         if (process.env.NODE_ENV !== 'test') console.log(`inserted ${articles.length} articles` )
         articleIds = articles;
         const comments = [];
-
         articleIds.forEach(article => {
             let randomCallCount = process.env.NODE_ENV === 'test'? 1 : Math.floor(Math.random() * 5)
             while (randomCallCount){
-                comments.push(createComment(article._id));
+                comments.push(createComment(article._id, '',  userIds));
                 randomCallCount--;
             }
         })
-        function createComment (articleId) {
-            return comment = {
-                body: chance.sentence(),
-                belongs_to: articleId,
-                created_at: chance.timestamp(),
-                votes: Math.floor(Math.random() * 50),
-                created_by: userIds[Math.floor(Math.random() * (userIds.length))]._id
-            };
-        }
         return Comments.insertMany(comments)
     })
     .then(comments => {
@@ -48,9 +39,10 @@ const seedDB = (DB, topics, users, articles) => {
         console.log(`inserted ${comments.length} comments`)
         console.log('finished seeding!');
         }
+
        return [topicIds,userIds, articleIds];
     })
-    .catch(err => err)
+    .catch(console.log)
 }
 
 module.exports = {seedDB}

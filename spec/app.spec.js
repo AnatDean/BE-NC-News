@@ -10,9 +10,9 @@ const mongoose = require('mongoose')
 describe.only('app', () => {
     let articles,topics, users
     beforeEach(() => {
-        return mongoose.connection.db.dropDatabase() 
+        return mongoose.connection.db.dropDatabase()
         .then(() => {
-            return seedDB(DB, topicData, userData, articleData)
+        return seedDB(DB, topicData, userData, articleData)
         })
         .then(([topicIds,userIds, articleIds]) => {
             articles = articleIds;
@@ -150,6 +150,21 @@ describe.only('app', () => {
                     expect(article.comments.length).to.equal(article.commentCount)
                     expect(article.comments[0].belongs_to).to.equal(`${article._id}`)
                     expect(article.comments[0]).to.haveOwnProperty('created_at')
+                });
+            });
+            it.only('POST /api/articles/:id adds a comment to an article responds with a 201 and returned comment ', () => {
+                const [article] = articles
+                const comment = {message: 'test comment'}
+                return request
+                .post(`/api/articles/${article._id}`)
+                .send(comment)
+                .expect(201)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    const newComment = body.comment
+                    expect(newComment.body).to.equal(comment.message);
+                    expect(newComment).to.have.all.keys('__v', '_id','body', 'belongs_to', 'created_at', 'votes', 'created_by');
+                    expect(newComment.belongs_to).to.equal(`${article._id}`)
                 });
             });
         });
