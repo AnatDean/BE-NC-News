@@ -3,9 +3,8 @@ const Chance = require('chance');
 const chance = new Chance;
 
 const seedDB = (DB, topics, users, articles) => {
-    return new Promise ((resolve, reject) => {
-        let topicIds, userIds, articleIds
-        return Promise.all([Topics.insertMany(topics), Users.insertMany(users)])
+    let topicIds, userIds, articleIds
+    return Promise.all([Topics.insertMany(topics), Users.insertMany(users)])
     .then(([topics, users]) => {
         if (process.env.NODE_ENV !== 'test') {
             console.log(`inserted ${topics.length} topics` )
@@ -27,7 +26,7 @@ const seedDB = (DB, topics, users, articles) => {
         const comments = [];
 
         articleIds.forEach(article => {
-            let randomCallCount = Math.floor(Math.random() * 5)
+            let randomCallCount = process.env.NODE_ENV === 'test'? 1 : Math.floor(Math.random() * 5)
             while (randomCallCount){
                 comments.push(createComment(article._id));
                 randomCallCount--;
@@ -49,10 +48,9 @@ const seedDB = (DB, topics, users, articles) => {
         console.log(`inserted ${comments.length} comments`)
         console.log('finished seeding!');
         }
-       resolve([topicIds,userIds, articleIds]);
+       return [topicIds,userIds, articleIds];
     })
-    .catch(err => reject(err))
-    })     
+    .catch(err => err)
 }
 
 module.exports = {seedDB}

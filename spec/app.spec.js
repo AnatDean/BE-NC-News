@@ -7,7 +7,7 @@ const {topicData, userData, articleData}  = require('../seed/testData/');
 const request = require('supertest')(app);
 const mongoose = require('mongoose')
 
-describe('app', () => {
+describe.only('app', () => {
     let articles,topics, users
     beforeEach(() => {
         return mongoose.connection.db.dropDatabase() 
@@ -30,10 +30,11 @@ describe('app', () => {
                 .get('/api/topics')
                 .expect(200)
                 .expect('content-type', /json/)
-                .then(res => {
-                    expect(res.body.topics).to.be.an('Array')
-                    expect(res.body.topics.length).to.equal(topics.length)
-                    expect(res.body.topics[1].slug).to.equal(topics[1].slug)
+                .then(({body}) => {
+                    const resTopics = body.topics
+                    expect(resTopics).to.be.an('Array')
+                    expect(resTopics.length).to.equal(topics.length)
+                    expect(resTopics[1].slug).to.equal(topics[1].slug)
                 })
             });
             it('GET /topics/:id/articles resolves with a 200 and an array of articles by topic', () => {
@@ -43,9 +44,10 @@ describe('app', () => {
                 .expect(200)
                 .expect('content-type', /json/)
                 .then(({body}) => {
-                    expect(body.articles).to.be.an('Array');
-                    expect(body.articles.length).to.equal(belongsToNumber)
-                    expect(body.articles[1].belongs_to).to.equal(`${(topics[1]._id)}`)
+                    const {articles} = body
+                    expect(articles).to.be.an('Array');
+                    expect(articles.length).to.equal(belongsToNumber)
+                    expect(articles[1].belongs_to).to.equal(`${(topics[1]._id)}`)
                 })
             });
             it('POST /topics/:id/articles resolves with a 201 and responds with the posted article text', () => {
@@ -56,10 +58,11 @@ describe('app', () => {
                 .expect(201)
                 .expect('content-type', /json/)
                 .then(({body}) => {
-                    expect(body.article).to.be.an('Object');
-                    expect(body.article.text).to.equal(article.text);
-                    expect(body.article.title).to.equal(article.title);
-                    expect(body.article.hasOwnProperty('_id')).to.be.true;
+                    const resArticle = body.article
+                    expect(resArticle).to.be.an('Object');
+                    expect(resArticle.text).to.equal(article.text);
+                    expect(resArticle.title).to.equal(article.title);
+                    expect(resArticle).to.haveOwnProperty('_id');
                 })
             });
         });
@@ -116,6 +119,38 @@ describe('app', () => {
                 .then(({body}) => {
                     expect(body.message).to.equal('Bad Request: Articles have to have a title and a body');
                 })
+            });
+        });
+        describe('articles (successful requests)', () => {
+            it('GET /api/articles responds with 200 and array of all articles with topic and comment info attached', () => {
+                return request
+                .get('/api/articles')
+                .expect(200)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    const {articles} = body
+                    expect(articles).to.be.an('Array');
+                    expect(articles.length).to.equal(articles.length);
+                    expect(articles[0].commentCount).to.equal(1);
+                    expect(articles[0].belongs_to).to.haveOwnProperty('slug');
+                    expect(articles[1].title).to.equal(articles[1].title);
+                });
+            });
+            it('GET /api/articles/:id responds with 200 and a single article with comments belonging to that article', () => {
+                const [article] = articles
+                return request
+                .get(`/api/articles/${article._id}`)
+                .expect(200)
+                .expect('content-type', /json/)
+                .then(({body}) => {
+                    const {article} = body
+                    expect(article._id).to.equal(`${article._id}`)
+                    expect(article.title).to.equal(article.title)
+                    expect(article.commentCount).to.equal(1)
+                    expect(article.comments.length).to.equal(article.commentCount)
+                    expect(article.comments[0].belongs_to).to.equal(`${article._id}`)
+                    expect(article.comments[0]).to.haveOwnProperty('created_at')
+                });
             });
         });
     });

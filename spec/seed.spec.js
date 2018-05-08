@@ -7,9 +7,9 @@ const {topicData, userData, articleData}  = require('../seed/testData/');
 
 describe('seed', () => {
     let articles,topics, users;
-    beforeEach(() => {
+    before(() => {
         return mongoose.connect(DB)
-        .then(() => mongoose.connection.db.dropDatabase() )
+        .then(() => mongoose.connection.db.dropDatabase())
         .then(() => {
             return seedDB(DB, topicData, userData, articleData)
         })
@@ -19,10 +19,9 @@ describe('seed', () => {
             users = userIds;
         })
         .catch(console.log)
-    
-        
-    }); 
-    afterEach(()=> {return mongoose.disconnect()}) ;
+    })
+
+    after(() => mongoose.disconnect()) ;
 
     it('Seeds topicData', () => {
         expect(topics.length).to.equal(topicData.length);

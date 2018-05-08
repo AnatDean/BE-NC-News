@@ -25,7 +25,8 @@ app.use((err, req, res, next) => {
     else next(err)
 })
 app.use((err, req, res, next) => {
-    res.status(500).send({message: 'Internal server error'})
+    console.log(err)
+    res.status(500).send({message: err})
 })
 
 module.exports = app
