@@ -375,13 +375,29 @@ describe.only('app', () => {
                         expect(body.message).to.equal("Sorry that comment never existed!")
                 })
             });
-            it.only('DELETE /comments/:id responds with 404 if valid mongo id but not existing comment', () => {
+            it('DELETE /comments/:id responds with 404 if valid mongo id but not existing comment', () => {
                 const [article] = articles
                 return request
                     .delete(`/api/comments/${article._id}`)
                     .expect(404)
                     .then(({body}) => {
                         expect(body.message).to.equal("Sorry that comment never existed!")
+                })
+            });
+        });
+        describe('users (successful requests)', () => {
+            it('GET /users/:username responds with 200 and a user object by username', () => {
+                const [user] = users;
+                return request
+                .get(`/api/users/${user.username}`)
+                .expect(200)
+                .then(({body}) => {
+                    const returnedUser = body.user
+                    expect(returnedUser.username).to.equal(user.username);
+                    expect(returnedUser._id).to.equal(`${user._id}`)
+                    expect(returnedUser).to.haveOwnProperty('avatar_url');
+                    expect(returnedUser).to.haveOwnProperty('name');
+
                 })
             });
         });

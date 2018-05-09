@@ -1,4 +1,4 @@
-const {Topics, Articles, Comments, Users} = require('../models')
+const {Topics, Articles, Users} = require('../models')
 
 exports.getAllTopics = (req,res,next) => {
     return Topics.find()
