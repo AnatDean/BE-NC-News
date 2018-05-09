@@ -8,16 +8,17 @@ const request = require('supertest')(app);
 const mongoose = require('mongoose')
 
 describe.only('app', () => {
-    let articles,topics, users
+    let articles,topics, users, comments
     beforeEach(() => {
         return mongoose.connection.db.dropDatabase()
         .then(() => {
         return seedDB(DB, topicData, userData, articleData)
         })
-        .then(([topicIds,userIds, articleIds]) => {
-            articles = articleIds;
-            topics = topicIds;
-            users = userIds;
+        .then(([topicDocs,userDocs, articleDocs, commentDocs]) => {
+            articles = articleDocs;
+            topics = topicDocs;
+            users = userDocs;
+            comments = commentDocs
         })
         .catch(console.log)   
     }); 
@@ -282,6 +283,28 @@ describe.only('app', () => {
                 .then(({body}) => {
                     expect(body.article.votes).to.equal(article.votes)
                 })
+            });
+        });
+        describe('comments  (successful requests)', () => {
+            it('PUT /api/comments/:id?vote=up increments vote up for a comment', () => {
+                const [comment] = comments;
+                return request
+                .put(`/api/comments/${comment._id}?vote=up`)
+                .expect(200)
+                .then(({body}) => {
+                    const updatedComment = body.comment;
+                    expect(updatedComment.votes).to.equal(comment.votes+1)
+                });
+            });
+            it('PUT /api/comments/:id?vote=down increments vote down for a comment', () => {
+                const [comment] = comments;
+                return request
+                .put(`/api/comments/${comment._id}?vote=down`)
+                .expect(200)
+                .then(({body}) => {
+                    const updatedComment = body.comment;
+                    expect(updatedComment.votes).to.equal(comment.votes-1)
+                });
             });
         });
     });
