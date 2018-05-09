@@ -41,5 +41,4 @@ exports.addArticleToTopic = (req,res,next) => {
         const [error] = err.errors?  Object.keys(err.errors) : Object.keys(err)
         if (error === 'belongs_to' || err.name === 'CastError') return next({status: 404, message: "Sorry that topic doesn't exist!" });
         if (error === 'title') return next({status: 400, message: 'Bad Request: Articles have to have a title and a body' })
-    })
 }
