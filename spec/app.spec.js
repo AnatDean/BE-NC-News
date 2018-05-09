@@ -7,7 +7,7 @@ const {topicData, userData, articleData}  = require('../seed/testData/');
 const request = require('supertest')(app);
 const mongoose = require('mongoose')
 
-describe.only('app', () => {
+describe('app', () => {
     let articles,topics, users, comments
     beforeEach(() => {
         return mongoose.connection.db.dropDatabase()
