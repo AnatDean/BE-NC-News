@@ -401,5 +401,23 @@ describe.only('app', () => {
                 })
             });
         });
+        describe('users (ERROR handling)', () => {
+            it('GET users/:id responds with 404 with invalid id ', () => {
+                return request
+                .get('/api/users/test')
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that user doesn't exist!");
+                })
+            });
+            it('GET users/:id responds with 404 with valid mongo id but not an existing user', () => {
+                return request
+                .get(`/api/users/${topics[0]._id}`)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that user doesn't exist!");
+                })
+            });
+        });
     });
 });
