@@ -258,7 +258,7 @@ describe.only('app', () => {
                     expect(body.message).to.equal("Sorry that article doesn't exist!")
                 })
             });
-            it('PUT /articles/:id responds with 404 if invalid id', () => {
+            it('PUT /articles/:id responds with 404 if valid mongo id but not an existing article', () => {
                 return request
                 .put(`/api/articles/${topics[0]._id}?vote=up`)
                 .expect(404)
@@ -266,7 +266,7 @@ describe.only('app', () => {
                     expect(body.message).to.equal("Sorry that article doesn't exist!")
                 })
             });
-            it('PUT /articles/:id responds with 404 if invalid id', () => {
+            it('PUT /articles/:id responds with 200 if vote query value', () => {
                 const [article] = articles
                 return request
                 .put(`/api/articles/${article._id}?vote=test`)
@@ -275,7 +275,7 @@ describe.only('app', () => {
                     expect(body.article.votes).to.equal(article.votes)
                 })
             });
-            it('PUT /articles/:id responds with 404 if invalid id', () => {
+            it('PUT /articles/:id responds with 200 if invalid vote query key', () => {
                 const [article] = articles
                 return request
                 .put(`/api/articles/${article._id}?test=up`)
@@ -328,6 +328,60 @@ describe.only('app', () => {
                     const findComment = () => body.article.comments.find(oneComment => oneComment._id === comment._id)
                     expect(body.article.commentCount).to.equal(returnedArticle.commentCount -1);
                     expect(findComment()).to.be.undefined;
+                })
+            });
+        });
+        describe('comments  (ERROR handling)', () => {
+            it('PUT /comments/:id responds with 404 if invalid id', () => {
+                return request
+                .put('/api/comments/test?vote=up')
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that comment doesn't exist!")
+                })
+            });
+            it('PUT /comments/:id responds with 404 if a valid mongo id but not an existing comment', () => {
+                const [article] = articles
+                return request
+                .put(`/api/comments/${article._id}?vote=up`)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that comment doesn't exist!")
+                })
+            });
+            it('PUT /comments/:id responds with 200 if vote query value', () => {
+                const [comment] = comments
+                return request
+                .put(`/api/comments/${comment._id}?vote=test`)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.comment.votes).to.equal(comment.votes)
+                })
+            });
+            it('PUT /comments/:id responds with 200 if invalid vote query key', () => {
+                const [comment] = comments
+                return request
+                .put(`/api/comments/${comment._id}?test=up`)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.comment.votes).to.equal(comment.votes)
+                })
+            });
+            it('DELETE /comments/:id responds with 404 if invalid id', () => {
+                return request
+                    .delete('/api/comments/test')
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.message).to.equal("Sorry that comment never existed!")
+                })
+            });
+            it.only('DELETE /comments/:id responds with 404 if valid mongo id but not existing comment', () => {
+                const [article] = articles
+                return request
+                    .delete(`/api/comments/${article._id}`)
+                    .expect(404)
+                    .then(({body}) => {
+                        expect(body.message).to.equal("Sorry that comment never existed!")
                 })
             });
         });
