@@ -19,10 +19,9 @@ describe('seed', () => {
             users = userIds;
         })
         .catch(console.log)
-    
-        
-    }); 
-    afterEach(()=> {return mongoose.disconnect()}) ;
+    })
+
+    after(() => mongoose.disconnect()) ;
 
     it('Seeds topicData', () => {
         expect(topics.length).to.equal(topicData.length);
