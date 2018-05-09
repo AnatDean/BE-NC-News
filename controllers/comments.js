@@ -1,4 +1,4 @@
-const {Topics, Articles, Comments, Users} = require('../models')
+const {Comments} = require('../models')
 
 exports.incrementCommentVote = (req,res,next) => {
     let vote;

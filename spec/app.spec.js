@@ -375,13 +375,47 @@ describe('app', () => {
                         expect(body.message).to.equal("Sorry that comment never existed!")
                 })
             });
-            it.only('DELETE /comments/:id responds with 404 if valid mongo id but not existing comment', () => {
+            it('DELETE /comments/:id responds with 404 if valid mongo id but not existing comment', () => {
                 const [article] = articles
                 return request
                     .delete(`/api/comments/${article._id}`)
                     .expect(404)
                     .then(({body}) => {
                         expect(body.message).to.equal("Sorry that comment never existed!")
+                })
+            });
+        });
+        describe('users (successful requests)', () => {
+            it('GET /users/:username responds with 200 and a user object by username', () => {
+                const [user] = users;
+                return request
+                .get(`/api/users/${user.username}`)
+                .expect(200)
+                .then(({body}) => {
+                    const returnedUser = body.user
+                    expect(returnedUser.username).to.equal(user.username);
+                    expect(returnedUser._id).to.equal(`${user._id}`)
+                    expect(returnedUser).to.haveOwnProperty('avatar_url');
+                    expect(returnedUser).to.haveOwnProperty('name');
+
+                })
+            });
+        });
+        describe('users (ERROR handling)', () => {
+            it('GET users/:id responds with 404 with invalid id ', () => {
+                return request
+                .get('/api/users/test')
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that user doesn't exist!");
+                })
+            });
+            it('GET users/:id responds with 404 with valid mongo id but not an existing user', () => {
+                return request
+                .get(`/api/users/${topics[0]._id}`)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that user doesn't exist!");
                 })
             });
         });

@@ -1,4 +1,4 @@
-const {Topics, Articles, Comments, Users} = require('../models')
+const {Articles, Comments, Users} = require('../models')
 const {createComment} = require('../seed/helpers')
 
 exports.getAllArticles = (req,res,next) => {
