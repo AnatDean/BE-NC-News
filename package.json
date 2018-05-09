@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha spec/seed.spec.js",
+    "test": "mocha spec/",
     "seed:test": "NODE_ENV=test node ./seed/seed.js",
     "seed:dev": "NODE_ENV=dev node ./seed/seed.js",
     "dev": "NODE_ENV=dev nodemon listen.js"

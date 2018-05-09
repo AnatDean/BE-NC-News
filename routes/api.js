@@ -5,8 +5,7 @@ const {
     articlesRouter,
     commentsRouter, 
     usersRouter
-    } = require('./index');
-
+    } = require('./');
 
 router.use('/topics', topicsRouter)
 router.use('/articles', articlesRouter)
