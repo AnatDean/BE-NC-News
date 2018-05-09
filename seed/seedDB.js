@@ -39,7 +39,6 @@ const seedDB = (DB, topics, users, articles) => {
         console.log(`inserted ${comments.length} comments`)
         console.log('finished seeding!');
         }
-
        return [topicDocs,userDocs, articleDocs, comments];
     })
     .catch(console.log)
