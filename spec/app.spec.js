@@ -190,5 +190,99 @@ describe.only('app', () => {
                 })
             });
         });
+        describe('articles (ERROR handling)', () => {
+            it('GET articles/:id responds with 404 with invalid id ', () => {
+                return request
+                .get('/api/articles/test')
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that article doesn't exist!");
+                })
+            });
+            it('GET articles/:id responds with 404 with valid mongo id but not an existing article', () => {
+                return request
+                .get(`/api/articles/${topics[0]._id}`)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that article doesn't exist!");
+                })
+            });
+            it('POST /articles/:id responds with 404 with invalid id ', () => {
+                const comment = {message: 'test comment'}
+                return request
+                .post('/api/articles/test')
+                .send(comment)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that article doesn't exist!")
+                });
+            });
+            it('POST /articles/:id responds with 404 with valid mongo id but not existing article ', () => {
+                const comment = {message: 'test comment'}
+                return request
+                .post(`/api/articles/${topics[0]._id}`)
+                .send(comment)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that article doesn't exist!")
+                });
+            });
+            it('POST /articles/:id responds with 400 with missing keys in comment', () => {
+                const [article] = articles;
+                const comment = {test: 'test comment'}
+                return request
+                .post(`/api/articles/${article._id}`)
+                .send(comment)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Bad Request: Comments have to have a message")
+                });
+            });
+            it('POST /articles/:id responds with 400 with empty message in comment', () => {
+                const [article] = articles;
+                const comment = {message: ''}
+                return request
+                .post(`/api/articles/${article._id}`)
+                .send(comment)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Bad Request: Comments have to have a message")
+                });
+            });
+            it('PUT /articles/:id responds with 404 if invalid id', () => {
+                return request
+                .put('/api/articles/test?vote=up')
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that article doesn't exist!")
+                })
+            });
+            it('PUT /articles/:id responds with 404 if invalid id', () => {
+                return request
+                .put(`/api/articles/${topics[0]._id}?vote=up`)
+                .expect(404)
+                .then(({body}) => {
+                    expect(body.message).to.equal("Sorry that article doesn't exist!")
+                })
+            });
+            it('PUT /articles/:id responds with 404 if invalid id', () => {
+                const [article] = articles
+                return request
+                .put(`/api/articles/${article._id}?vote=test`)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.article.votes).to.equal(article.votes)
+                })
+            });
+            it('PUT /articles/:id responds with 404 if invalid id', () => {
+                const [article] = articles
+                return request
+                .put(`/api/articles/${article._id}?test=up`)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.article.votes).to.equal(article.votes)
+                })
+            });
+        });
     });
 });

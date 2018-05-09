@@ -37,32 +37,51 @@ exports.getAllArticles = (req,res,next) => {
         .lean()
     ])
         .then(([article, comments]) => {
+            if (!article) throw ({name: 'CastError'})
             article.commentCount = comments.length;
             article.comments = [...comments];
             res.status(200).send({article})
         })
-        .catch(next)
+        .catch(err => {
+            if (err.name === 'CastError') return next({status:404, message: "Sorry that article doesn't exist!"})
+            else return next(err)
+        })
 }
 
 exports.addComment = (req,res,next) => {
-    const {_id} = req.params
-    return Users.findOne({username: 'northcoder'})
-    .then(user => {
+    const {_id} = req.params;
+    const {message} = req.body;
+    if (!message) return next ({status:400, message: "Bad Request: Comments have to have a message"})
+    return Promise.all([Articles.findById(req.params), Users.findOne({username: 'northcoder'})])
+    .then(([article, user]) => {
+        if (!article) throw ({name: 'ValidationError'})
         const comment = createComment(_id, req.body.message, user._id);
         return Comments.create(comment)
     })
     .then(comment => {
         res.status(201).send({comment}) 
     })
-    .catch(next)
+    .catch(err => {
+        if (err.name ==='ValidationError' || err.name === 'CastError') return next({status:404, message: "Sorry that article doesn't exist!"})
+        if (err.name ==='BadRequest') return next({status:400, message: "Bad Request: Comments have to have a message"})
+
+        else return next(err)
+    })
 }
 
 exports.incrementVoteArticle = (req,res,next) => {
     let vote;
     vote = req.query.vote === 'up'? 1 : req.query.vote === 'down'? -1 : 0;
-    return Articles.findByIdAndUpdate(req.params, {$inc: {votes: vote}}, {new:true})
+    return Articles.findById(req.params)
+    .then(article => {
+        if (!article) throw ({name: 'CastError'})
+        return Articles.findByIdAndUpdate(req.params, {$inc: {votes: vote}}, {new:true})
+    })
     .then(article => {
         res.status(200).send({article})
     })
-    .catch(next)
+    .catch(err => {
+        if (err.name === 'CastError') return next({status:404, message: "Sorry that article doesn't exist!"}) 
+        else return next(err)
+    })
 }
