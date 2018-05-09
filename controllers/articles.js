@@ -56,3 +56,13 @@ exports.addComment = (req,res,next) => {
     })
     .catch(next)
 }
+
+exports.incrementVoteArticle = (req,res,next) => {
+    let vote;
+    vote = req.query.vote === 'up'? 1 : req.query.vote === 'down'? -1 : 0;
+    return Articles.findByIdAndUpdate(req.params, {$inc: {votes: vote}}, {new:true})
+    .then(article => {
+        res.status(200).send({article})
+    })
+    .catch(next)
+}

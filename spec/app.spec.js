@@ -152,7 +152,7 @@ describe.only('app', () => {
                     expect(article.comments[0]).to.haveOwnProperty('created_at')
                 });
             });
-            it.only('POST /api/articles/:id adds a comment to an article responds with a 201 and returned comment ', () => {
+            it('POST /api/articles/:id adds a comment to an article responds with a 201 and returned comment ', () => {
                 const [article] = articles
                 const comment = {message: 'test comment'}
                 return request
@@ -166,6 +166,28 @@ describe.only('app', () => {
                     expect(newComment).to.have.all.keys('__v', '_id','body', 'belongs_to', 'created_at', 'votes', 'created_by');
                     expect(newComment.belongs_to).to.equal(`${article._id}`)
                 });
+            });
+            it('PUT /api/articles/:id?vote=up increments vote up for an article', () => {
+                const [article] = articles
+                return request
+                .put(`/api/articles/${article._id}?vote=up`)
+                .expect(200)
+                .then(({body}) => {
+                    const updatedArticle = body.article
+                    expect(updatedArticle._id).to.equal(`${article._id}`);
+                    expect(updatedArticle.votes).to.equal(article.votes+1)
+                })
+            });
+            it('PUT /api/articles/:id?vote=down decrements vote down for an article', () => {
+                const [article] = articles
+                return request
+                .put(`/api/articles/${article._id}?vote=down`)
+                .expect(200)
+                .then(({body}) => {
+                    const updatedArticle = body.article
+                    expect(updatedArticle._id).to.equal(`${article._id}`);
+                    expect(updatedArticle.votes).to.equal(article.votes-1)
+                })
             });
         });
     });
