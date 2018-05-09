@@ -306,6 +306,30 @@ describe.only('app', () => {
                     expect(updatedComment.votes).to.equal(comment.votes-1)
                 });
             });
+            it('DELETE /api/comments/:id responds with a 204 and deletes comment by id', () => {
+                const [comment] = comments
+                const articleId = comment.belongs_to;
+                let returnedArticle
+                return request
+                .get(`/api/articles/${articleId}`)
+                .expect(200)
+                .then(({body}) => {
+                    returnedArticle = body.article;
+                    return request
+                    .delete(`/api/comments/${comment._id}`)
+                    .expect(204)
+                })
+                .then(() => {
+                    return request
+                    .get(`/api/articles/${articleId}`)
+                    .expect(200)
+                })
+                .then(({body}) => {
+                    const findComment = () => body.article.comments.find(oneComment => oneComment._id === comment._id)
+                    expect(body.article.commentCount).to.equal(returnedArticle.commentCount -1);
+                    expect(findComment()).to.be.undefined;
+                })
+            });
         });
     });
 });

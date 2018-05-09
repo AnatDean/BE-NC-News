@@ -12,3 +12,11 @@ exports.incrementCommentVote = (req,res,next) => {
     })
     .catch(next)
 }
+
+exports.deleteComment = (req,res,next) => {
+    return Comments.findByIdAndRemove(req.params)
+    .then(comment => {
+        res.status(204).send({comment})
+    })
+    .catch(next)
+}
