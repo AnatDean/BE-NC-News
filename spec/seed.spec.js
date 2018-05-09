@@ -7,9 +7,9 @@ const {topicData, userData, articleData}  = require('../seed/testData/');
 
 describe('seed', () => {
     let articles,topics, users;
-    before(() => {
+    beforeEach(() => {
         return mongoose.connect(DB)
-        .then(() => mongoose.connection.db.dropDatabase())
+        .then(() => mongoose.connection.db.dropDatabase() )
         .then(() => {
             return seedDB(DB, topicData, userData, articleData)
         })

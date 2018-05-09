@@ -7,7 +7,6 @@ const {
     usersRouter
     } = require('./');
 
-
 router.use('/topics', topicsRouter)
 router.use('/articles', articlesRouter)
 router.use('/comments', commentsRouter)

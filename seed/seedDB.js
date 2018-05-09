@@ -1,5 +1,6 @@
 const {Topics, Users, Articles, Comments} = require('../models/index');
 const {createComment} = require('./helpers')
+
 const Chance = require('chance');
 const chance = new Chance;
 
@@ -39,7 +40,6 @@ const seedDB = (DB, topics, users, articles) => {
         console.log(`inserted ${comments.length} comments`)
         console.log('finished seeding!');
         }
-
        return [topicIds,userIds, articleIds];
     })
     .catch(console.log)

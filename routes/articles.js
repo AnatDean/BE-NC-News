@@ -10,5 +10,4 @@ router.route('/:_id')
     .post(addComment)
     .put(incrementVoteArticle)
 
-
 module.exports = router;
