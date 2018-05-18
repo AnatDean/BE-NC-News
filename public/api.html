@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>BE-NC-NEWS</title>
+</head>
+<body>
+  <header>
+      <h1>Northcoders News</h1>
+  </header>
+  <Summary>
+      <h1>API Endpoints</h1>
+  </Summary>
+  <Main>
+      <h2 style="color:#21AF8E;">GET: <code>/api/topics</code></h2>
+      <p><strong>Get all the topics</strong></p>
+      <h2 style="color:#21AF8E;">GET: <code>/api/topics/:topic_id/articles</code></h2>
+      <p><strong>Return all the articles for a certain topic</strong></p>
+      <h2 style="color:#21AF8E;">GET: <code>/api/articles</code></h2>
+      <p><strong>Returns all the articles</strong></p>
+      <h2 style="color:#21AF8E;">GET: <code>/api/articles/:article_id</code></h2>
+      <p><strong>Get an individual article with its comments</strong></p>
+      <h2 style="color:#21AF8E;">POST: <code>/api/articles/:article_id</code></h2>
+      <p><strong>Add a new comment to an article. This route requires a JSON <code>body</code> with a <code>message</code> key and value pair<br>
+        e.g: <code>{"message": "This is my new comment"}</code>
+      </strong></p>
+      <h2 style="color:#21AF8E;">PUT: <code>/api/articles/:article_id</code></h2>
+      <p><strong>Increment or Decrement the votes of an article by one. This route requires a <code>vote</code> query of 'up' or 'down'<br>
+        e.g: <code>http://northcoders-news-api.herokuapp.com/api/articles/:article_id?vote=up</code>
+      </strong></p>
+      <h2 style="color:#21AF8E;">PUT: <code>/api/comments/:comment_id</code></h2>
+      <p><strong>Increment or Decrement the votes of a comment by one. This route requires a <code>vote</code> query of 'up' or 'down'<br>
+        e.g: <code>http://northcoders-news-api.herokuapp.com/api/comments/:comment_id?vote=down</code>
+      </strong></p>
+      <h2 style="color:#21AF8E;">DELETE: <code>/api/comments/:comment_id</code></h2>
+      <p><strong>Deletes a comment</strong></p>
+      <h2 style="color:#21AF8E;">GET: <code>/api/users/:username</code></h2>
+      <p><strong>Returns a JSON object with the profile data for the specified user.</strong></p>  
+  </Main>
+  
+</body>
+</html>
