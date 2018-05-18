@@ -1,3 +1,4 @@
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev' 
 const app = require('express')();
 const bodyParser = require('body-parser');
 const {DB, PORT} = require('./config');
