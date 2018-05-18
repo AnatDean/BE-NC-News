@@ -1,4 +1,4 @@
-env = process.env.NODE_ENV;
+env = process.env.NODE_ENV === 'test'? process.env.NODE_ENV : 'dev';
 const {topicData, userData, articleData}  = require(`./${env}Data/`);
 const {seedDB} = require('./seedDB');
 const {DB, PORT} = require('../config/index');
