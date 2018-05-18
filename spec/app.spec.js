@@ -48,7 +48,7 @@ describe('app', () => {
                     const {articles} = body
                     expect(articles).to.be.an('Array');
                     expect(articles.length).to.equal(belongsToNumber)
-                    expect(articles[1].belongs_to).to.equal(`${(topics[1]._id)}`)
+                    expect(articles[1].belongs_to._id).to.equal(`${(topics[1]._id)}`)
                 })
             });
             it('POST /topics/:id/articles resolves with a 201 and responds with the posted article text', () => {
