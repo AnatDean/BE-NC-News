@@ -1,5 +1,5 @@
 const {Articles, Comments, Users} = require('../models')
-const {createComment} = require('../seed/helpers')
+const {createComment, formatArticles} = require('../utils')
 
 exports.getAllArticles = (req,res,next) => {
     return Promise.all([
@@ -13,14 +13,7 @@ exports.getAllArticles = (req,res,next) => {
     .lean()
     ])
     .then(([articles,comments]) => {
-        const commentCount = comments.reduce((count, comment) => {
-            count[comment.belongs_to._id] = (count[comment.belongs_to] || 0) + 1;
-            return count
-        }, {})
-        articles.forEach(article => {
-            article.commentCount = commentCount[article._id] || 0
-        })
-
+        articles = formatArticles(articles, comments)
         res.status(200).send({articles})
     })
     .catch(next)

@@ -1,4 +1,5 @@
-const {Topics, Articles, Users} = require('../models')
+const {Topics, Articles, Users, Comments} = require('../models')
+const {formatArticles} = require('../utils')
 
 exports.getAllTopics = (req,res,next) => {
     return Topics.find()
@@ -10,8 +11,18 @@ exports.getAllTopics = (req,res,next) => {
 
 exports.getArticleByTopic = (req,res,next) => {
     const {id} = req.params
-    return Articles.find({belongs_to: id})
-    .then(articles => {
+    return Promise.all([
+    Articles.find({belongs_to: id})
+    .populate({path: 'belongs_to', select: {'__v': 0}})
+    .populate({ path: 'created_by', select: {'__v': 0, 'avatar_url': 0, 'name': 0}})
+    .lean(),
+    Comments.find()
+    .populate({path: 'belongs_to', select: {'_id': 1}})
+    .populate({ path: 'created_by', select: {'__v': 0, 'avatar_url': 0, 'name': 0}})
+    .lean()
+    ])
+    .then(([articles, comments])=> {
+        articles = formatArticles(articles, comments)
         res.status(200).send({articles})
     })
     .catch(err => {

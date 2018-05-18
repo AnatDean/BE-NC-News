@@ -1,5 +1,5 @@
 const {Topics, Users, Articles, Comments} = require('../models/index');
-const {createComment} = require('./helpers')
+const {createComment} = require('../utils/')
 const Chance = require('chance');
 const chance = new Chance;
 
@@ -22,7 +22,7 @@ const seedDB = (DB, topics, users, articles) => {
         return Articles.insertMany(newArticles)
     })
     .then(articles => {
-        if (process.env.NODE_ENV !== 'test') console.log(`inserted ${articles.length} articles` )
+        if (process.env.NODE_ENV !== 'test') console.log(`inserted ${articles.length} articles` );
         articleDocs = articles;
         const comments = [];
         articleDocs.forEach(article => {
