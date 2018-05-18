@@ -1,7 +1,8 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev' 
 const app = require('express')();
 const bodyParser = require('body-parser');
-const {DB, PORT} = require('./config');
+const {DB} = process.env || require('./config') ;
+
 const {apiRouter} = require('./routes')
 const mongoose = require('mongoose');
 const morgan = require('morgan')('dev');
