@@ -8,7 +8,7 @@
     "seed:test": "NODE_ENV=test node ./seed/seed.js",
     "seed:dev": "NODE_ENV=dev node ./seed/seed.js",
     "seed:prod": "NODE_ENV=production node ./seed/seed.js",
-
+    "start": "node listen.js",
     "dev": "NODE_ENV=dev nodemon listen.js"
   },
   "repository": {
