@@ -18,13 +18,27 @@
       <p><strong>Get all the topics</strong></p>
       <h2 style="color:#21AF8E;">GET: <code>/api/topics/:topic_id/articles</code></h2>
       <p><strong>Return all the articles for a certain topic</strong></p>
+      
+      <h2 style="color:#21AF8E;">POST: <code>/api/topics/:topic_id/articles</code></h2>
+      <p><strong>Add a new article to a topic. This route requires a JSON <code>body</code> with a <code>title and body</code> key value pairs<br>
+       e.g: <code>
+        {
+        "title": "This is my article title",
+        "body": "This is my article body"
+        }
+      </code>
+      </strong></p>
       <h2 style="color:#21AF8E;">GET: <code>/api/articles</code></h2>
       <p><strong>Returns all the articles</strong></p>
       <h2 style="color:#21AF8E;">GET: <code>/api/articles/:article_id</code></h2>
       <p><strong>Get an individual article with its comments</strong></p>
       <h2 style="color:#21AF8E;">POST: <code>/api/articles/:article_id</code></h2>
       <p><strong>Add a new comment to an article. This route requires a JSON <code>body</code> with a <code>message</code> key and value pair<br>
-        e.g: <code>{"message": "This is my new comment"}</code>
+        e.g: <code>
+          {
+          "message": "This is my new comment"
+          }
+        </code>
       </strong></p>
       <h2 style="color:#21AF8E;">PUT: <code>/api/articles/:article_id</code></h2>
       <p><strong>Increment or Decrement the votes of an article by one. This route requires a <code>vote</code> query of 'up' or 'down'<br>
