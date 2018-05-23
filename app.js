@@ -22,7 +22,7 @@ app.get('/api', function (req, res) {
     res.sendFile(path.join(__dirname + '/public/api.html'))
 })
 
-app.use ('/*', (req, res, next) => next({status: 404}))
+app.use ('/*', (req, res, next) => next({status: 404, controller: 'page'}))
 
 app.use((err, req,res,next) => {
     if (err.status === 400) return res.status(400).send({message: err.message ||'Bad Request'})
