@@ -21,7 +21,7 @@ exports.getAllArticles = (req,res,next) => {
 
  exports.getArticleById = (req,res,next) => {
     return Promise.all([Articles.findOne(req.params)
-        .populate({ path: 'belongs_to', select: {'__v':0}})
+        .populate({ path: 'belongs_tocontroller', select: {'__v':0}})
         .populate({ path: 'created_by', select: { 'avatar_url': 0, '__v':0, 'name': 0 }})
         .lean(),
         Comments
@@ -36,7 +36,7 @@ exports.getAllArticles = (req,res,next) => {
             res.status(200).send({article})
         })
         .catch(err => {
-            if (err.name === 'CastError') return next({status:404, message: "Sorry that article doesn't exist!"})
+            if (err.name === 'CastError') return next({status:404, controller: "article"})
             else return next(err)
         })
 }
@@ -55,7 +55,7 @@ exports.addComment = (req,res,next) => {
         res.status(201).send({comment}) 
     })
     .catch(err => {
-        if (err.name ==='ValidationError' || err.name === 'CastError') return next({status:404, message: "Sorry that article doesn't exist!"})
+        if (err.name ==='ValidationError' || err.name === 'CastError') return next({status:404, controller: "article"})
         if (err.name ==='BadRequest') return next({status:400, message: "Bad Request: Comments have to have a message"})
 
         else return next(err)
@@ -63,8 +63,7 @@ exports.addComment = (req,res,next) => {
 }
 
 exports.incrementVoteArticle = (req,res,next) => {
-    let vote;
-    vote = req.query.vote === 'up'? 1 : req.query.vote === 'down'? -1 : 0;
+    const vote = req.query.vote === 'up'? 1 : req.query.vote === 'down'? -1 : 0;
     return Articles.findById(req.params)
     .then(article => {
         if (!article) throw ({name: 'CastError'})
@@ -74,7 +73,7 @@ exports.incrementVoteArticle = (req,res,next) => {
         res.status(200).send({article})
     })
     .catch(err => {
-        if (err.name === 'CastError') return next({status:404, message: "Sorry that article doesn't exist!"}) 
+        if (err.name === 'CastError') return next({status:404, controller: "article"}) 
         else return next(err)
     })
 }

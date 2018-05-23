@@ -1,8 +1,7 @@
 const {Comments} = require('../models')
 
 exports.incrementCommentVote = (req,res,next) => {
-    let vote;
-    vote = req.query.vote === 'up'? 1 : req.query.vote === 'down'? -1 : 0;
+    const vote = req.query.vote === 'up'? 1 : req.query.vote === 'down'? -1 : 0;
     return Comments.findById(req.params)
     .then(comment => {
         if (!comment) throw ({path: '_id'})
@@ -12,7 +11,7 @@ exports.incrementCommentVote = (req,res,next) => {
         res.status(200).send({comment})
     })
     .catch(err => {
-        if (err.path === '_id') return next({status:404, message:"Sorry that comment doesn't exist!"})
+        if (err.path === '_id') return next({status:404, controller: "comment"})
         else return next(err)
     })
 }
@@ -27,7 +26,7 @@ exports.deleteComment = (req,res,next) => {
         res.status(204).send({comment})
     })
     .catch(err => {
-        if (err.path === '_id') return next({status:404, message:"Sorry that comment never existed!"})
+        if (err.path === '_id') return next({status:404, controller: "comment"})
         else return next(err)
     })
 }

@@ -2,16 +2,14 @@ process.env.NODE_ENV = 'test';
 const mongoose = require('mongoose');
 const {expect} = require('chai');
 const {seedDB} = require('../seed/seedDB');
-const {DB} = require('../config');
 const {topicData, userData, articleData}  = require('../seed/testData/');
 
 describe('seed', () => {
     let articles,topics, users, comments;
-    before(() => {
-        return mongoose.connect(DB)
-        .then(() => mongoose.connection.db.dropDatabase())
+    beforeEach(() => {
+        return mongoose.connection.db.dropDatabase()
         .then(() => {
-            return seedDB(DB, topicData, userData, articleData)
+            return seedDB(topicData, userData, articleData)
         })
         .then(([topicDocs,userDocs, articleDocs, commentDocs]) => {
             articles = articleDocs;
@@ -20,8 +18,8 @@ describe('seed', () => {
             comments = commentDocs;
         })
         .catch(console.log)
-    })
 
+    })
     after(() => mongoose.disconnect()) ;
 
     it('Seeds topicData', () => {
