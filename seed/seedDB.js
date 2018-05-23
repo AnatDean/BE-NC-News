@@ -3,7 +3,7 @@ const {createComment} = require('../utils/')
 const Chance = require('chance');
 const chance = new Chance;
 
-const seedDB = (DB, topics, users, articles) => {
+const seedDB = (topics, users, articles) => {
     let topicDocs, userDocs, articleDocs
     return Promise.all([Topics.insertMany(topics), Users.insertMany(users)])
     .then(([topics, users]) => {
@@ -14,10 +14,10 @@ const seedDB = (DB, topics, users, articles) => {
         topicDocs = topics;
         userDocs = users;
         const newArticles = articles.map((article, i) => {
-            article.belongs_to = topicDocs.find(topic => topic.slug === article.topic)._id;
-            article.votes = Math.floor(Math.random() * 50);
-            article.created_by = userDocs[Math.floor(Math.random() * (userDocs.length))]._id;
-            return article
+            const belongs_to = topicDocs.find(topic => topic.slug === article.topic)._id;
+            const votes = Math.floor(Math.random() * 50);
+            const created_by = userDocs[Math.floor(Math.random() * (userDocs.length))]._id;
+            return {...article, belongs_to, votes, created_by}
         });
         return Articles.insertMany(newArticles)
     })
@@ -27,10 +27,7 @@ const seedDB = (DB, topics, users, articles) => {
         const comments = [];
         articleDocs.forEach(article => {
             let randomCallCount = process.env.NODE_ENV === 'test'? 1 : Math.floor(Math.random() * 5)
-            while (randomCallCount){
-                comments.push(createComment(article._id, '',  userDocs));
-                randomCallCount--;
-            }
+            while (randomCallCount--) comments.push(createComment(article._id, '',  userDocs));
         })
         return Comments.insertMany(comments)
     })
