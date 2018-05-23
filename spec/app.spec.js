@@ -2,7 +2,6 @@ process.env.NODE_ENV = 'test';
 const {expect} = require('chai')
 const app = require('../app');
 const {seedDB} = require('../seed/seedDB');
-const {DB} = require('../config');
 const {topicData, userData, articleData}  = require('../seed/testData/');
 const request = require('supertest')(app);
 const mongoose = require('mongoose')
@@ -12,7 +11,7 @@ describe('app', () => {
     beforeEach(() => {
         return mongoose.connection.db.dropDatabase()
         .then(() => {
-        return seedDB(DB, topicData, userData, articleData)
+        return seedDB(topicData, userData, articleData)
         })
         .then(([topicDocs,userDocs, articleDocs, commentDocs]) => {
             articles = articleDocs;
@@ -22,8 +21,6 @@ describe('app', () => {
         })
         .catch(console.log)   
     }); 
-    after(()=>  mongoose.disconnect());
-
     describe('api', () => {
         describe('topics (successful requests)', () => {
             it('GET /topics resolves with a 200 and array of topics', () => {
@@ -44,8 +41,7 @@ describe('app', () => {
                 .get(`/api/topics/${topics[1]._id}/articles`)
                 .expect(200)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    const {articles} = body
+                .then(({body:{articles}}) => {
                     expect(articles).to.be.an('Array');
                     expect(articles.length).to.equal(belongsToNumber)
                     expect(articles[1].belongs_to._id).to.equal(`${(topics[1]._id)}`)
@@ -73,8 +69,8 @@ describe('app', () => {
                 .get(`/api/topics/fake123/articles`)
                 .expect(404)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that topic doesn't exist!");
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that topic doesn't exist!");
                 })
             });
             it('POST /topics/:id/articles resolves with a 404 when not an existing topic', () => {
@@ -84,8 +80,8 @@ describe('app', () => {
                 .send(article)
                 .expect(404)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that topic doesn't exist!");
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that topic doesn't exist!");
                 })
             });
             it('POST /topics/:id/articles resolves with a 400 when article missing fields', () => {
@@ -95,8 +91,8 @@ describe('app', () => {
                 .send(article)
                 .expect(400)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    expect(body.message).to.equal('Bad Request: Articles have to have a title and a body');
+                .then(({body:{message}}) => {
+                    expect(message).to.equal('Bad Request: Articles have to have a title and a body');
                 })
             });
             it('POST /topics/:id/articles resolves with a 404 when valid mongo id but not existing topic', () => {
@@ -106,8 +102,8 @@ describe('app', () => {
                 .send(article)
                 .expect(404)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that topic doesn't exist!");
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that topic doesn't exist!");
                 })
             });
             it('POST /topics/:id/articles resolves with a 400 when article missing fields', () => {
@@ -117,8 +113,8 @@ describe('app', () => {
                 .send(article)
                 .expect(400)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    expect(body.message).to.equal('Bad Request: Articles have to have a title and a body');
+                .then(({body:{message}}) => {
+                    expect(message).to.equal('Bad Request: Articles have to have a title and a body');
                 })
             });
         });
@@ -129,27 +125,26 @@ describe('app', () => {
                 .expect(200)
                 .expect('content-type', /json/)
                 .then(({body}) => {
-                    const {articles} = body
-                    expect(articles).to.be.an('Array');
-                    expect(articles.length).to.equal(articles.length);
-                    expect(articles[0].commentCount).to.equal(1);
-                    expect(articles[0].belongs_to).to.haveOwnProperty('slug');
-                    expect(articles[1].title).to.equal(articles[1].title);
+                    const resArticles = body.articles
+                    expect(resArticles).to.be.an('Array');
+                    expect(resArticles.length).to.equal(articles.length);
+                    expect(resArticles[0].commentCount).to.equal(1);
+                    expect(resArticles[0].belongs_to).to.haveOwnProperty('slug');
+                    expect(resArticles[1].title).to.equal(articles[1].title);
                 });
             });
             it('GET /api/articles/:id responds with 200 and a single article with comments belonging to that article', () => {
-                const [article] = articles
+                const [testArticle] = articles
                 return request
-                .get(`/api/articles/${article._id}`)
+                .get(`/api/articles/${testArticle._id}`)
                 .expect(200)
                 .expect('content-type', /json/)
-                .then(({body}) => {
-                    const {article} = body
-                    expect(article._id).to.equal(`${article._id}`)
-                    expect(article.title).to.equal(article.title)
+                .then(({body:{article}}) => {
+                    expect(article._id).to.equal(`${testArticle._id}`)
+                    expect(article.title).to.equal(testArticle.title)
                     expect(article.commentCount).to.equal(1)
                     expect(article.comments.length).to.equal(article.commentCount)
-                    expect(article.comments[0].belongs_to).to.equal(`${article._id}`)
+                    expect(article.comments[0].belongs_to).to.equal(`${testArticle._id}`)
                     expect(article.comments[0]).to.haveOwnProperty('created_at')
                 });
             });
@@ -313,8 +308,8 @@ describe('app', () => {
                 return request
                 .get(`/api/articles/${articleId}`)
                 .expect(200)
-                .then(({body}) => {
-                    returnedArticle = body.article;
+                .then(({body:{article}}) => {
+                    returnedArticle = article;
                     return request
                     .delete(`/api/comments/${comment._id}`)
                     .expect(204)
@@ -324,9 +319,9 @@ describe('app', () => {
                     .get(`/api/articles/${articleId}`)
                     .expect(200)
                 })
-                .then(({body}) => {
-                    const findComment = () => body.article.comments.find(oneComment => oneComment._id === comment._id)
-                    expect(body.article.commentCount).to.equal(returnedArticle.commentCount -1);
+                .then(({body:{article}}) => {
+                    const findComment = () => article.comments.find(oneComment => oneComment._id === comment._id)
+                    expect(article.commentCount).to.equal(returnedArticle.commentCount -1);
                     expect(findComment()).to.be.undefined;
                 })
             });
@@ -336,8 +331,8 @@ describe('app', () => {
                 return request
                 .put('/api/comments/test?vote=up')
                 .expect(404)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that comment doesn't exist!")
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that comment doesn't exist!")
                 })
             });
             it('PUT /comments/:id responds with 404 if a valid mongo id but not an existing comment', () => {
@@ -345,8 +340,8 @@ describe('app', () => {
                 return request
                 .put(`/api/comments/${article._id}?vote=up`)
                 .expect(404)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that comment doesn't exist!")
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that comment doesn't exist!")
                 })
             });
             it('PUT /comments/:id responds with 200 if vote query value', () => {
@@ -371,8 +366,8 @@ describe('app', () => {
                 return request
                     .delete('/api/comments/test')
                     .expect(404)
-                    .then(({body}) => {
-                        expect(body.message).to.equal("Sorry that comment never existed!")
+                    .then(({body:{message}}) => {
+                        expect(message).to.equal("Sorry that comment doesn't exist!")
                 })
             });
             it('DELETE /comments/:id responds with 404 if valid mongo id but not existing comment', () => {
@@ -380,23 +375,22 @@ describe('app', () => {
                 return request
                     .delete(`/api/comments/${article._id}`)
                     .expect(404)
-                    .then(({body}) => {
-                        expect(body.message).to.equal("Sorry that comment never existed!")
+                    .then(({body:{message}}) => {
+                        expect(message).to.equal("Sorry that comment doesn't exist!")
                 })
             });
         });
         describe('users (successful requests)', () => {
             it('GET /users/:username responds with 200 and a user object by username', () => {
-                const [user] = users;
+                const [testUser] = users;
                 return request
-                .get(`/api/users/${user.username}`)
+                .get(`/api/users/${testUser.username}`)
                 .expect(200)
-                .then(({body}) => {
-                    const returnedUser = body.user
-                    expect(returnedUser.username).to.equal(user.username);
-                    expect(returnedUser._id).to.equal(`${user._id}`)
-                    expect(returnedUser).to.haveOwnProperty('avatar_url');
-                    expect(returnedUser).to.haveOwnProperty('name');
+                .then(({body:{user}}) => {
+                    expect(user.username).to.equal(testUser.username);
+                    expect(user._id).to.equal(`${testUser._id}`)
+                    expect(user).to.haveOwnProperty('avatar_url');
+                    expect(user).to.haveOwnProperty('name');
 
                 })
             });
@@ -406,16 +400,16 @@ describe('app', () => {
                 return request
                 .get('/api/users/test')
                 .expect(404)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that user doesn't exist!");
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that user doesn't exist!");
                 })
             });
             it('GET users/:id responds with 404 with valid mongo id but not an existing user', () => {
                 return request
                 .get(`/api/users/${topics[0]._id}`)
                 .expect(404)
-                .then(({body}) => {
-                    expect(body.message).to.equal("Sorry that user doesn't exist!");
+                .then(({body:{message}}) => {
+                    expect(message).to.equal("Sorry that user doesn't exist!");
                 })
             });
         });

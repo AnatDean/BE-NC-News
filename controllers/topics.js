@@ -26,17 +26,18 @@ exports.getArticleByTopic = (req,res,next) => {
         res.status(200).send({articles})
     })
     .catch(err => {
-        if (err.name === 'CastError') return next({status:404, message: "Sorry that topic doesn't exist!"})
+        if (err.name === 'CastError') return next({status:404, controller: "topic"})
         else next()
     })
 }
 
 exports.addArticleToTopic = (req,res,next) => {
-    const {body, title} = req.body;
+    const {body, title} = req.body
+    if (!body | !title) return next({status: 400, message: 'Bad Request: Articles have to have a title and a body' })
     const {id} = req.params;
     return Promise.all([Users.findOne(), Topics.find({_id: id})])
     .then(([{_id}, topics]) => {
-        if (!topics.length) throw({errors: {'belongs_to': 404}})
+        if (!topics.length) throw({name: 'CastError'})
         const article = {
             title,
             body,
@@ -49,8 +50,7 @@ exports.addArticleToTopic = (req,res,next) => {
         res.status(201).send({article})
     })
     .catch((err) => {
-        const [error] = err.errors?  Object.keys(err.errors) : Object.keys(err)
-        if (error === 'belongs_to' || err.name === 'CastError') return next({status: 404, message: "Sorry that topic doesn't exist!" });
-        if (error === 'title') return next({status: 400, message: 'Bad Request: Articles have to have a title and a body' })
+        if (err.name === 'CastError') return next({status: 404, controller: 'topic' });
+        else return next(err)
     });
 }
