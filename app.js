@@ -6,13 +6,16 @@ const {apiRouter} = require('./routes')
 const mongoose = require('mongoose');
 const morgan = require('morgan')('dev');
 const path = require('path')
+const cors = require("cors");
+
 
 mongoose.Promise = Promise;
 
 mongoose.connect(DB)
-  .then(() => console.log(`successfully connected to ${DB}`))
-  .catch(err => console.log(`connection failed ${err}`));
+.then(() => console.log(`successfully connected to ${DB}`))
+.catch(err => console.log(`connection failed ${err}`));
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan)
 
