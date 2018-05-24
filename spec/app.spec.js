@@ -38,7 +38,7 @@ describe('app', () => {
             it('GET /topics/:id/articles resolves with a 200 and an array of articles by topic', () => {
                 const belongsToNumber = articles.filter(article => article.belongs_to === topics[1]._id).length
                 return request
-                .get(`/api/topics/${topics[1]._id}/articles`)
+                .get(`/api/topics/${topics[1].slug}/articles`)
                 .expect(200)
                 .expect('content-type', /json/)
                 .then(({body:{articles}}) => {
@@ -50,7 +50,7 @@ describe('app', () => {
             it('POST /topics/:id/articles resolves with a 201 and responds with the posted article text', () => {
                 const article = {title: 'article', body:'this is my article'}
                 return request
-                .post(`/api/topics/${topics[1]._id}/articles`)
+                .post(`/api/topics/${topics[1].slug}/articles`)
                 .send(article)
                 .expect(201)
                 .expect('content-type', /json/)
