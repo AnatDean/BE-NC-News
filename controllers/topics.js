@@ -10,17 +10,20 @@ exports.getAllTopics = (req,res,next) => {
 }
 
 exports.getArticleByTopic = (req,res,next) => {
-    const {id} = req.params
-    return Promise.all([
-    Articles.find({belongs_to: id})
-    .populate({path: 'belongs_to', select: {'__v': 0}})
-    .populate({ path: 'created_by', select: {'__v': 0, 'avatar_url': 0, 'name': 0}})
-    .lean(),
-    Comments.find()
-    .populate({path: 'belongs_to', select: {'_id': 1}})
-    .populate({ path: 'created_by', select: {'__v': 0, 'avatar_url': 0, 'name': 0}})
-    .lean()
-    ])
+    return Topics.findOne(req.params).lean()
+    .then(topic => {
+        if(!topic) throw({name: 'CastError'})
+        return Promise.all([
+        Articles.find({belongs_to: topic._id})
+            .populate({path: 'belongs_to', select: {'__v': 0}})
+            .populate({ path: 'created_by', select: {'__v': 0, 'avatar_url': 0, 'name': 0}})
+            .lean(),
+        Comments.find()
+            .populate({path: 'belongs_to', select: {'_id': 1}})
+            .populate({ path: 'created_by', select: {'__v': 0, 'avatar_url': 0, 'name': 0}})
+            .lean()
+        ])
+    })
     .then(([articles, comments])=> {
         articles = formatArticles(articles, comments)
         res.status(200).send({articles})
@@ -34,14 +37,13 @@ exports.getArticleByTopic = (req,res,next) => {
 exports.addArticleToTopic = (req,res,next) => {
     const {body, title} = req.body
     if (!body | !title) return next({status: 400, message: 'Bad Request: Articles have to have a title and a body' })
-    const {id} = req.params;
-    return Promise.all([Users.findOne(), Topics.find({_id: id})])
+    return Promise.all([Users.findOne(), Topics.find(req.params)])
     .then(([{_id}, topics]) => {
         if (!topics.length) throw({name: 'CastError'})
         const article = {
             title,
             body,
-            belongs_to: id,
+            belongs_to: topics[0]._id,
             created_by: _id
         }
     return Articles.create(article)

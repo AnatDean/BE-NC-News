@@ -5,7 +5,7 @@ const {getAllTopics, getArticleByTopic, addArticleToTopic} = require('../control
 router.route('/')
     .get(getAllTopics)
 
-router.route('/:id/articles')
+router.route('/:slug/articles')
     .get(getArticleByTopic)
     .post(addArticleToTopic)
 
