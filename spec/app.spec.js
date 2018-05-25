@@ -161,6 +161,7 @@ describe('app', () => {
                     expect(newComment.body).to.equal(comment.message);
                     expect(newComment).to.have.all.keys('__v', '_id','body', 'belongs_to', 'created_at', 'votes', 'created_by');
                     expect(newComment.belongs_to).to.equal(`${article._id}`)
+                    expect(newComment.votes).to.equal(0)
                 });
             });
             it('PUT /api/articles/:id?vote=up increments vote up for an article', () => {
