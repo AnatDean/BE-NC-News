@@ -51,8 +51,9 @@ exports.addComment = (req,res,next) => {
         const comment = createComment(_id, req.body.message, user._id);
         return Comments.create(comment)
     })
-    .then(comment => {
-        res.status(201).send({comment}) 
+    .then(({_doc}) => {
+        const sendComment = {..._doc, created_by: 'northcoder' }
+        res.status(201).send({comment:sendComment}) 
     })
     .catch(err => {
         if (err.name ==='ValidationError' || err.name === 'CastError') return next({status:404, controller: "article"})
