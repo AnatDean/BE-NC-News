@@ -11,7 +11,7 @@ mongoose.connect(DB)
     mongoose.connection.db.dropDatabase()
 })
 .then(() => {
-    return seedDB(DB, topicData, userData, articleData)
+    return seedDB(topicData, userData, articleData)
 })
 .then(() => {
     mongoose.disconnect()
