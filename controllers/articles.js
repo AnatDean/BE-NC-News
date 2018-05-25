@@ -48,7 +48,7 @@ exports.addComment = (req,res,next) => {
     return Promise.all([Articles.findById(req.params), Users.findOne({username: 'northcoder'})])
     .then(([article, user]) => {
         if (!article) throw ({name: 'ValidationError'})
-        const comment = createComment(_id, req.body.message, user._id);
+        const comment = createComment(_id, req.body.message, user._id, 'new');
         return Comments.create(comment)
     })
     .then(({_doc}) => {
