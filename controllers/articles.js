@@ -52,9 +52,8 @@ exports.addComment = (req,res,next) => {
         return Comments.create(comment)
     })
     .then(({_doc}) => {
-        const sendComment = {..._doc, created_by: 'northcoder' }
-        res.status(201).send({comment:sendComment}) 
-    })
+        _doc.created_by.username = 'northcoder' ;
+        res.status(201).send({comment:_doc}) 
     .catch(err => {
         if (err.name ==='ValidationError' || err.name === 'CastError') return next({status:404, controller: "article"})
         if (err.name ==='BadRequest') return next({status:400, message: "Bad Request: Comments have to have a message"})
