@@ -2,11 +2,11 @@ const Chance = require('chance');
 const chance = new Chance;
 
 
-exports.createComment = (articleId, message, userIds ) => {
+exports.createComment = (articleId, message, userIds, newComment ) => {
     return {
         body: message? message: chance.sentence(),
         belongs_to: articleId,
-        votes: Math.floor(Math.random() * 50),
+        votes: newComment !== 'new'? Math.floor(Math.random() * 50) : 0,
         created_by: !message ? userIds[Math.floor(Math.random() * (userIds.length))]._id : userIds
     }
 }
