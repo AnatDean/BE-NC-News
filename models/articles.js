@@ -24,6 +24,10 @@ const ArticleSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users',
     required: true
+  },
+  date: {
+      type: Number,
+      default: new Date().getTime()
   }
 });
 

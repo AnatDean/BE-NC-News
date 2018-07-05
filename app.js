@@ -8,7 +8,6 @@ const morgan = require('morgan')('dev');
 const path = require('path')
 const cors = require("cors");
 
-
 mongoose.Promise = Promise;
 
 mongoose.connect(DB)
