@@ -60,6 +60,7 @@ describe('app', () => {
                     expect(resArticle.text).to.equal(article.text);
                     expect(resArticle.title).to.equal(article.title);
                     expect(resArticle).to.haveOwnProperty('_id');
+                    expect(resArticle).to.haveOwnProperty('date');
                 })
             });
         });
@@ -129,6 +130,7 @@ describe('app', () => {
                     expect(resArticles).to.be.an('Array');
                     expect(resArticles.length).to.equal(articles.length);
                     expect(resArticles[0].commentCount).to.equal(1);
+                    expect(resArticles[0]).to.haveOwnProperty('date');
                     expect(resArticles[0].belongs_to).to.haveOwnProperty('slug');
                     expect(resArticles[1].title).to.equal(articles[1].title);
                 });
@@ -142,6 +144,7 @@ describe('app', () => {
                 .then(({body:{article}}) => {
                     expect(article._id).to.equal(`${testArticle._id}`)
                     expect(article.title).to.equal(testArticle.title)
+                    expect(article).to.haveOwnProperty('date');
                     expect(article.commentCount).to.equal(1)
                     expect(article.comments.length).to.equal(article.commentCount)
                     expect(article.comments[0].belongs_to).to.equal(`${testArticle._id}`)

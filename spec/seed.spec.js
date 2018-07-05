@@ -29,7 +29,7 @@ describe('seed', () => {
     });
     it('seeds articleData', () => {
         expect(articles.length).to.equal(articleData.length);
-        expect(articles[0]._doc).to.have.all.keys('__v', '_id','body', 'title', 'belongs_to', 'votes', 'created_by');
+        expect(articles[0]._doc).to.have.all.keys('__v', '_id','body', 'title', 'belongs_to', 'votes', 'created_by', 'date');
         expect(articles[0]._doc.title).to.equal(articleData[0].title)
     });
     it('seeds userData', () => {
