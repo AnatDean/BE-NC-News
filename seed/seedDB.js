@@ -16,7 +16,7 @@ const seedDB = (topics, users, articles) => {
         const newArticles = articles.map((article, i) => {
             const belongs_to = topicDocs.find(topic => topic.slug === article.topic)._id;
             const votes = Math.floor(Math.random() * 50);
-            const created_by = userDocs[Math.floor(Math.random() * (userDocs.length))]._id;
+            const created_by = userDocs.find(user => article.created_by === user.username)
             return {...article, belongs_to, votes, created_by}
         });
         return Articles.insertMany(newArticles)
