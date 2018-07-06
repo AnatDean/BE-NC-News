@@ -25,6 +25,7 @@ const ArticleSchema = new Schema({
     ref: 'users',
     required: true
   },
+
   created_at: {
       type: Number,
       default: new Date().getTime()
